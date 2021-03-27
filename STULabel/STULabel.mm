@@ -1034,6 +1034,12 @@ static_assert((int)UIUserInterfaceLayoutDirectionRightToLeft == (int)STUWritingD
           _layer.font = newFont;
         }
       }
+      if (NSAttributedString* const truncationToken = _layer.truncationToken) {
+          auto* const newTruncationToken = [truncationToken stu_copyWithFontsAdjustedForContentSizeCategory:newCategory];
+          if (truncationToken != newTruncationToken) {
+              _layer.truncationToken = newTruncationToken;
+          }
+      }
     }
   }
 }
