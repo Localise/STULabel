@@ -1439,15 +1439,21 @@ static NSURL* __nullable urlLinkAttribute(STUTextLink* __unsafe_unretained link)
 
 - (void)touchesBegan:(NSSet<UITouch*>*)touches withEvent:(UIEvent*)event {
   _touchCount += touches.count;
-  [super touchesBegan:touches withEvent:event];
-  if (!_bits.isEnabled) return;
-  if (_ghostingMaskLayer) return;
-  if (_currentTouch) return; // Could happen if self.isMultipleTouchEnabled.
+  if (!_bits.isEnabled) {
+    [super touchesBegan:touches withEvent:event];
+    return;
+  }
+  if (_ghostingMaskLayer || _currentTouch) {
+    return;
+  }
   UITouch* const touch = touches.anyObject;
   const CGPoint point = [touch locationInView:self];
   STUTextLink* const link = [_layer.links linkClosestToPoint:point
                                                  maxDistance:_linkTouchAreaExtensionRadius];
-  if (!link) return;
+  if (!link) {
+    [super touchesBegan:touches withEvent:event];
+    return;
+  }
   STULabelOverlayStyle* const style = _bits.delegateRespondsToOverlayStyleForActiveLink
                                     ? [_delegate label:self overlayStyleForActiveLink:link
                                            withDefault:_activeLinkOverlayStyle]
